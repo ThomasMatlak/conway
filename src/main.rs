@@ -1,4 +1,3 @@
-// todo pause/resume button/key
 // todo manually advance frame-by-frame
 // todo draw the initial state
 // todo draw or erase while running
@@ -49,45 +48,53 @@ fn main() {
 
     window.limit_update_rate(Some(std::time::Duration::from_millis(100)));
 
+    let mut paused = true;
+
     while window.is_open() && !window.is_key_down(Key::Escape) {
-        let mut next_grid = vec![vec![false; WIDTH]; HEIGHT];
+        if window.is_key_down(Key::Space) {
+            paused = !paused;
+        }
 
-        for y in 0..grid.len() {
-            for x in 0..grid[y].len() {
-                buffer[(y * WIDTH) + x] = if grid[y][x] {u32::MAX} else {u32::MIN};
+        let mut next_grid = grid.clone();
 
-                let mut num_living_neighbors: u8 = 0;
-                // todo can this seires of ifs be turned nicely into a loop?
-                // todo implement wrap-around (optional?)
+        if !paused {
+            for y in 0..grid.len() {
+                for x in 0..grid[y].len() {
+                    buffer[(y * WIDTH) + x] = if grid[y][x] {u32::MAX} else {u32::MIN};
 
-                if y > 0 && x > 0 && grid[y - 1][x - 1] {
-                    num_living_neighbors += 1;
-                }
-                if y > 0 && grid[y - 1][x] {
-                    num_living_neighbors += 1;
-                }
-                if y > 0 && x < grid[y].len() - 1 && grid[y - 1][x + 1] {
-                    num_living_neighbors += 1;
-                }
-                if x < grid[y].len() - 1 && grid[y][x + 1] {
-                    num_living_neighbors += 1;
-                }
-                if y < grid.len() - 1 && x < grid[y].len() - 1 && grid[y + 1][x + 1] {
-                    num_living_neighbors += 1;
-                }
-                if y < grid.len() - 1 && grid[y + 1][x] {
-                    num_living_neighbors += 1;
-                }
-                if y < grid.len() - 1 && x > 0 && grid[y + 1][x - 1] {
-                    num_living_neighbors += 1;
-                }
-                if x > 0 && grid[y][x - 1] {
-                    num_living_neighbors += 1;
-                }
+                    let mut num_living_neighbors: u8 = 0;
+                    // todo can this seires of ifs be turned nicely into a loop?
+                    // todo implement wrap-around (optional?)
 
-                next_grid[y][x] = match num_living_neighbors {
-                    n if 2 <= n && n <= 3 => true,
-                    _ => false
+                    if y > 0 && x > 0 && grid[y - 1][x - 1] {
+                        num_living_neighbors += 1;
+                    }
+                    if y > 0 && grid[y - 1][x] {
+                        num_living_neighbors += 1;
+                    }
+                    if y > 0 && x < grid[y].len() - 1 && grid[y - 1][x + 1] {
+                        num_living_neighbors += 1;
+                    }
+                    if x < grid[y].len() - 1 && grid[y][x + 1] {
+                        num_living_neighbors += 1;
+                    }
+                    if y < grid.len() - 1 && x < grid[y].len() - 1 && grid[y + 1][x + 1] {
+                        num_living_neighbors += 1;
+                    }
+                    if y < grid.len() - 1 && grid[y + 1][x] {
+                        num_living_neighbors += 1;
+                    }
+                    if y < grid.len() - 1 && x > 0 && grid[y + 1][x - 1] {
+                        num_living_neighbors += 1;
+                    }
+                    if x > 0 && grid[y][x - 1] {
+                        num_living_neighbors += 1;
+                    }
+
+                    next_grid[y][x] = match num_living_neighbors {
+                        n if 2 <= n && n <= 3 => true,
+                        _ => false
+                    }
                 }
             }
         }
