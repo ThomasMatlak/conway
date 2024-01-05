@@ -1,9 +1,9 @@
 // todo pause/resume button/key
 // todo manually advance frame-by-frame
 // todo draw the initial state
+// todo draw or erase while running
 // todo export current state
 // todo import a file that specifies initial state
-// todo add ability to draw or erase while running
 // todo make refresh time an input parameter (decouple simulation ticks from fps?)
 
 use minifb::{self, Window, WindowOptions, Key, Scale};
@@ -86,7 +86,6 @@ fn main() {
                 }
 
                 next_grid[y][x] = match num_living_neighbors {
-                    n if n < 2 => false,
                     n if 2 <= n && n <= 3 => true,
                     _ => false
                 }
