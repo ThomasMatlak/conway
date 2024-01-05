@@ -1,11 +1,10 @@
-// todo manually advance frame-by-frame
 // todo draw the initial state
 // todo draw or erase while running
 // todo export current state
 // todo import a file that specifies initial state
 // todo make refresh time an input parameter (decouple simulation ticks from fps?)
 
-use minifb::{self, Window, WindowOptions, Key, Scale};
+use minifb::{self, Window, WindowOptions, Key, Scale, KeyRepeat};
 use rand::{self, random};
 
 
@@ -16,6 +15,7 @@ fn main() {
     let mut grid = vec![vec![false; WIDTH]; HEIGHT];
 
     // random initial state
+    // todo why does this leave the right side of the window empty?
     // for y in 0..grid.len() {
     //     for x in 0..grid[y].len() {
     //         if random() {
@@ -63,7 +63,7 @@ fn main() {
 
         let mut next_grid = grid.clone();
 
-        if !paused || window.is_key_down(Key::Enter) {
+        if !paused || window.is_key_pressed(Key::L, KeyRepeat::No) {
             for y in 0..grid.len() {
                 for x in 0..grid[y].len() {
                     let mut num_living_neighbors: u8 = 0;
