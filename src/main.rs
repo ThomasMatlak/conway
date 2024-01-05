@@ -45,8 +45,14 @@ fn main() {
 
     // todo handle resizing
     let mut buffer: Vec<u32> = vec![0; WIDTH * HEIGHT];
+    for y in 0..grid.len() {
+        for x in 0..grid.len() {
+            buffer[(y * WIDTH) + x] = if grid[y][x] {u32::MAX} else {u32::MIN};
+        }
+    }
 
     window.limit_update_rate(Some(std::time::Duration::from_millis(100)));
+    window.update_with_buffer(&buffer, WIDTH, HEIGHT).unwrap();
 
     let mut paused = true;
 
@@ -57,44 +63,33 @@ fn main() {
 
         let mut next_grid = grid.clone();
 
-        if !paused {
+        if !paused || window.is_key_down(Key::Enter) {
             for y in 0..grid.len() {
                 for x in 0..grid[y].len() {
-                    buffer[(y * WIDTH) + x] = if grid[y][x] {u32::MAX} else {u32::MIN};
-
                     let mut num_living_neighbors: u8 = 0;
-                    // todo can this seires of ifs be turned nicely into a loop?
                     // todo implement wrap-around (optional?)
 
-                    if y > 0 && x > 0 && grid[y - 1][x - 1] {
-                        num_living_neighbors += 1;
-                    }
-                    if y > 0 && grid[y - 1][x] {
-                        num_living_neighbors += 1;
-                    }
-                    if y > 0 && x < grid[y].len() - 1 && grid[y - 1][x + 1] {
-                        num_living_neighbors += 1;
-                    }
-                    if x < grid[y].len() - 1 && grid[y][x + 1] {
-                        num_living_neighbors += 1;
-                    }
-                    if y < grid.len() - 1 && x < grid[y].len() - 1 && grid[y + 1][x + 1] {
-                        num_living_neighbors += 1;
-                    }
-                    if y < grid.len() - 1 && grid[y + 1][x] {
-                        num_living_neighbors += 1;
-                    }
-                    if y < grid.len() - 1 && x > 0 && grid[y + 1][x - 1] {
-                        num_living_neighbors += 1;
-                    }
-                    if x > 0 && grid[y][x - 1] {
-                        num_living_neighbors += 1;
+                    for y_d in 0..3 {
+                        for x_d in 0..3 {
+                            let y_i = y as isize;
+                            let x_i = x as isize;
+                            let y_delta = y_d - 1;
+                            let x_delta = x_d - 1;
+
+                            if (y_delta != 0 || x_delta != 0) && y_i + y_delta >= 0 && y_i + y_delta < (grid.len() as isize) && x_i + x_delta >= 0 && x_i + x_delta < (grid[y].len() as isize) {
+                                num_living_neighbors += match grid[(y_i + y_delta) as usize][(x_i + x_delta) as usize] {
+                                    true => 1,
+                                    false => 0
+                                }
+                            }
+                        }
                     }
 
                     next_grid[y][x] = match num_living_neighbors {
                         n if 2 <= n && n <= 3 => true,
                         _ => false
-                    }
+                    };
+                    buffer[(y * WIDTH) + x] = if next_grid[y][x] {u32::MAX} else {u32::MIN};
                 }
             }
         }
