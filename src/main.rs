@@ -71,9 +71,9 @@ fn main() {
             paused = true;
         }
 
-        let mut next_grid = grid.clone();
-
         if !paused || window.is_key_pressed(Key::L, KeyRepeat::No) {
+            let mut next_grid = grid.clone();
+
             for y in 0..grid.len() {
                 for x in 0..grid[y].len() {
                     let mut num_living_neighbors: u8 = 0;
@@ -103,9 +103,9 @@ fn main() {
                     buffer[(y * WIDTH) + x] = if next_grid[y][x] {u32::MAX} else {u32::MIN};
                 }
             }
+            grid = next_grid;
         }
 
         window.update_with_buffer(&buffer, WIDTH, HEIGHT).unwrap();
-        grid = next_grid;
     }
 }
