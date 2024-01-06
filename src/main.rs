@@ -1,5 +1,6 @@
 // todo export current state
 // todo import a file that specifies initial state
+// todo make random start, giant block, maybe other easy to implement a command line option
 // todo make refresh time an input parameter (decouple simulation ticks from fps?)
 
 use minifb::{self, Window, WindowOptions, Key, Scale, KeyRepeat};
@@ -12,22 +13,17 @@ const HEIGHT: usize = 300;
 fn main() {
     let mut grid = vec![vec![false; WIDTH]; HEIGHT];
 
-    // random initial state
-    // todo why does this leave the right side of the window empty?
     // for y in 0..grid.len() {
     //     for x in 0..grid[y].len() {
-    //         if random() {
-    //             grid[y][x] = true;
-    //         }
-    //     }
-    // }
-
-    // giant block in the middle
-    // for y in 0..grid.len() {
-    //     for x in 0..grid[y].len() {
-    //         if y >= 100 && y < 200 && x >= 100 && x < 300 {
-    //             grid[y][x] = true;
-    //         }
+            // random initial state
+            // todo why does this leave the right side of the window empty?
+            // if random() {
+            //     grid[y][x] = true;
+            // }
+            // giant block in the middle
+            // if y >= 100 && y < 200 && x >= 100 && x < 300 {
+            //     grid[y][x] = true;
+            // }
     //     }
     // }
 
@@ -67,6 +63,12 @@ fn main() {
                 grid[y][x] = true;
                 buffer[(y * WIDTH) + x] = u32::MAX;
             });
+        }
+
+        if window.is_key_pressed(Key::C, KeyRepeat::No) {
+            grid = vec![vec![false; WIDTH]; HEIGHT];
+            buffer = vec![0; WIDTH * HEIGHT];
+            paused = true;
         }
 
         let mut next_grid = grid.clone();
