@@ -95,8 +95,9 @@ fn main() {
                         }
                     }
 
-                    next_grid[y][x] = match num_living_neighbors {
-                        n if 2 <= n && n <= 3 => true,
+                    next_grid[y][x] = match (grid[y][x], num_living_neighbors) {
+                        (true, 2) => true,
+                        (_, 3) => true,
                         _ => false
                     };
                     buffer[(y * WIDTH) + x] = if next_grid[y][x] {u32::MAX} else {u32::MIN};
