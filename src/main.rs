@@ -2,6 +2,7 @@
 // todo import a file that specifies initial state
 // todo make random start, giant block, maybe other easy to implement a command line option
 // todo make refresh time an input parameter (decouple simulation ticks from fps?)
+// todo drawing while not paused
 
 use minifb::{self, Window, WindowOptions, Key, Scale, KeyRepeat};
 use rand::{self, random};
@@ -42,13 +43,13 @@ fn main() {
         }
     }
 
-    window.limit_update_rate(Some(std::time::Duration::from_millis(100)));
+    window.limit_update_rate(Some(std::time::Duration::from_micros(16600)));
     window.update_with_buffer(&buffer, WIDTH, HEIGHT).unwrap();
 
     let mut paused = true;
 
     while window.is_open() && !window.is_key_down(Key::Escape) {
-        if window.is_key_down(Key::Space) {
+        if window.is_key_pressed(Key::Space, KeyRepeat::No) {
             paused = !paused;
         }
 
@@ -72,23 +73,35 @@ fn main() {
             let mut next_grid = grid.clone();
 
             for y in 0..grid.len() {
+                let (y_minus_one, y_plus_one) = match y {
+                    0 => (grid.len() - 1, y + 1),
+                    i if i == grid.len() - 1 => (y - 1, 0),
+                    _ => (y - 1, y + 1)
+                };
+
                 for x in 0..grid[y].len() {
+                    let (x_minus_one, x_plus_one) = match x {
+                        0 => (grid[y].len() - 1, x + 1),
+                        i if i == grid[y].len() - 1 => (x - 1, 0),
+                        _ => (x - 1, x + 1)
+                    };
+
+                    let neighbors = [
+                        (x_minus_one, y_minus_one),
+                        (x_minus_one, y),
+                        (x_minus_one, y_plus_one),
+                        (x, y_plus_one),
+                        (x_plus_one, y_plus_one),
+                        (x_plus_one, y),
+                        (x_plus_one, y_minus_one),
+                        (x, y_minus_one)
+                    ];
+
                     let mut num_living_neighbors: u8 = 0;
-                    // todo implement wrap-around (optional?)
-
-                    for y_d in 0..3 {
-                        for x_d in 0..3 {
-                            let y_i = y as isize;
-                            let x_i = x as isize;
-                            let y_delta = y_d - 1;
-                            let x_delta = x_d - 1;
-
-                            if (y_delta != 0 || x_delta != 0) && y_i + y_delta >= 0 && y_i + y_delta < (grid.len() as isize) && x_i + x_delta >= 0 && x_i + x_delta < (grid[y].len() as isize) {
-                                num_living_neighbors += match grid[(y_i + y_delta) as usize][(x_i + x_delta) as usize] {
-                                    true => 1,
-                                    false => 0
-                                }
-                            }
+                    for neighbor in neighbors {
+                        num_living_neighbors += match grid[neighbor.1][neighbor.0] {
+                            true => 1,
+                            false => 0
                         }
                     }
 
