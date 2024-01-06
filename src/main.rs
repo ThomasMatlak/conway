@@ -1,5 +1,3 @@
-// todo draw the initial state
-// todo draw or erase while running
 // todo export current state
 // todo import a file that specifies initial state
 // todo make refresh time an input parameter (decouple simulation ticks from fps?)
@@ -25,13 +23,13 @@ fn main() {
     // }
 
     // giant block in the middle
-    for y in 0..grid.len() {
-        for x in 0..grid[y].len() {
-            if y >= 100 && y < 200 && x >= 100 && x < 300 {
-                grid[y][x] = true;
-            }
-        }
-    }
+    // for y in 0..grid.len() {
+    //     for x in 0..grid[y].len() {
+    //         if y >= 100 && y < 200 && x >= 100 && x < 300 {
+    //             grid[y][x] = true;
+    //         }
+    //     }
+    // }
 
     let mut window = Window::new(
         "Conway's Game of Life - Press ESC to quit",
@@ -59,6 +57,16 @@ fn main() {
     while window.is_open() && !window.is_key_down(Key::Escape) {
         if window.is_key_down(Key::Space) {
             paused = !paused;
+        }
+
+        if paused && window.is_active() && window.get_mouse_down(minifb::MouseButton::Left) {
+            let pos = window.get_mouse_pos(minifb::MouseMode::Discard);
+            pos.map(|mouse| {
+                let x = mouse.0 as usize;
+                let y = mouse.1 as usize;
+                grid[y][x] = true;
+                buffer[(y * WIDTH) + x] = u32::MAX;
+            });
         }
 
         let mut next_grid = grid.clone();
