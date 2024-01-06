@@ -13,19 +13,16 @@ const HEIGHT: usize = 300;
 fn main() {
     let mut grid = vec![vec![false; WIDTH]; HEIGHT];
 
-    // for y in 0..grid.len() {
-    //     for x in 0..grid[y].len() {
+    for y in 0..grid.len() {
+        for x in 0..grid[y].len() {
             // random initial state
-            // todo why does this leave the right side of the window empty?
-            // if random() {
-            //     grid[y][x] = true;
-            // }
+            grid[y][x] = random();
             // giant block in the middle
             // if y >= 100 && y < 200 && x >= 100 && x < 300 {
             //     grid[y][x] = true;
             // }
-    //     }
-    // }
+        }
+    }
 
     let mut window = Window::new(
         "Conway's Game of Life - Press ESC to quit",
@@ -40,7 +37,7 @@ fn main() {
     // todo handle resizing
     let mut buffer: Vec<u32> = vec![0; WIDTH * HEIGHT];
     for y in 0..grid.len() {
-        for x in 0..grid.len() {
+        for x in 0..grid[y].len() {
             buffer[(y * WIDTH) + x] = if grid[y][x] {u32::MAX} else {u32::MIN};
         }
     }
