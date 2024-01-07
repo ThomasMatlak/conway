@@ -3,13 +3,20 @@
 // todo make random start, giant block, maybe other easy to implement a command line option
 // todo make refresh time an input parameter (decouple simulation ticks from fps?)
 // todo drawing while not paused
+// todo make different rulesets selectable at runtime
+
+mod ruleset;
 
 use minifb::{self, Window, WindowOptions, Key, Scale, KeyRepeat};
 use rand::{self, random};
+use ruleset::Ruleset;
 
 
+// todo this is maxing out one CPU core - try to optimize
 const WIDTH: usize = 400;
 const HEIGHT: usize = 300;
+
+const RULESET: Ruleset = ruleset::Ruleset::Life;
 
 fn main() {
     let mut grid = vec![vec![false; WIDTH]; HEIGHT];
@@ -105,10 +112,18 @@ fn main() {
                         }
                     }
 
-                    next_grid[y][x] = match (grid[y][x], num_living_neighbors) {
-                        (true, 2) => true,
-                        (_, 3) => true,
-                        _ => false
+                    next_grid[y][x] = match RULESET {
+                        Ruleset::Life => life!(grid[y][x], num_living_neighbors),
+                        Ruleset::Replicator => replicator!(grid[y][x], num_living_neighbors),
+                        Ruleset::Seeds => seeds!(grid[y][x], num_living_neighbors),
+                        Ruleset::LifeWithoutDeath => life_without_death!(grid[y][x], num_living_neighbors),
+                        Ruleset::ThreeFourLife => three_four_life!(grid[y][x], num_living_neighbors),
+                        Ruleset::Diamoeba => diamoeba!(grid[y][x], num_living_neighbors),
+                        Ruleset::TwoByTwo => two_by_two!(grid[y][x], num_living_neighbors),
+                        Ruleset::HighLife => high_life!(grid[y][x], num_living_neighbors),
+                        Ruleset::NightAndDay => night_and_day!(grid[y][x], num_living_neighbors),
+                        Ruleset::Morley => morley!(grid[y][x], num_living_neighbors),
+                        Ruleset::Anneal => anneal!(grid[y][x], num_living_neighbors),
                     };
                     buffer[(y * WIDTH) + x] = if next_grid[y][x] {u32::MAX} else {u32::MIN};
                 }
