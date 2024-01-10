@@ -9,7 +9,8 @@ pub enum Ruleset {
     HighLife,
     NightAndDay,
     Morley,
-    Anneal
+    Anneal,
+    DryLife,
 }
 
 #[macro_export]
@@ -129,4 +130,16 @@ macro_rules! anneal {
             _ => false
         }
     }
+}
+
+#[macro_export]
+macro_rules! dry_life {
+    ($current_state:expr, $num_living_neighbors:expr) => {
+        match ($current_state, $num_living_neighbors) {
+            (true, 2) => true,
+            (_, 3) => true,
+            (false, 7) => true,
+            _ => false
+        }
+    };
 }

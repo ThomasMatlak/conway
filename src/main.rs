@@ -12,7 +12,6 @@ use rand::{self, random};
 use ruleset::Ruleset;
 
 
-// todo this is maxing out one CPU core - try to optimize
 const WIDTH: usize = 400;
 const HEIGHT: usize = 300;
 
@@ -21,14 +20,10 @@ const RULESET: Ruleset = ruleset::Ruleset::Life;
 fn main() {
     let mut grid = vec![vec![false; WIDTH]; HEIGHT];
 
+    // random initial state
     for y in 0..grid.len() {
         for x in 0..grid[y].len() {
-            // random initial state
             grid[y][x] = random();
-            // giant block in the middle
-            // if y >= 100 && y < 200 && x >= 100 && x < 300 {
-            //     grid[y][x] = true;
-            // }
         }
     }
 
@@ -38,6 +33,8 @@ fn main() {
         HEIGHT,
         WindowOptions{
             scale: Scale::X4,
+            resize: true,
+            scale_mode: minifb::ScaleMode::AspectRatioStretch,
             ..WindowOptions::default()
         }
     ).expect("Unable to create window :(");
@@ -124,6 +121,8 @@ fn main() {
                         Ruleset::NightAndDay => night_and_day!(grid[y][x], num_living_neighbors),
                         Ruleset::Morley => morley!(grid[y][x], num_living_neighbors),
                         Ruleset::Anneal => anneal!(grid[y][x], num_living_neighbors),
+                        Ruleset::DryLife => dry_life!(grid[y][x], num_living_neighbors),
+                        _ => todo!("Ruleset not implemented")
                     };
                     buffer[(y * WIDTH) + x] = if next_grid[y][x] {u32::MAX} else {u32::MIN};
                 }
